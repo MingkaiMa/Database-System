@@ -1,0 +1,63 @@
+Q1(2 marks)
+Define a SQL view Q1(unswid,name) that gives all the buildings that have more than 30 rooms. Each tuple in the view should contain the following:
+  the id of the building (Buildings.unswid field)   the name of the building (Buildings.name field)
+Q2 (2 marks)
+Define a SQL view Q2(name,faculty,phone,starting) which gives the details about all of the current Dean of Faculty. Each tuple in the view should contain the following:
+      
+  his/her name (use the name field from the People table)
+  thefaculty(usethelongnamefieldfromtheOrgUnitstable)
+  his/her phone number (use the phone field from Staff table)
+  the date when he/she was appointed (use the starting field from the Affiliations
+table)
+Since there is some dirty-looking data in the Affiliations table, you will need to ensure that you return only legitimate Deans of Faculty. Apply the following filters together:
+  only choose people whose role is exactly ‘Dean’
+  only choose organisational units whose type is actually ‘Faculty'
+Note: Every current Dean has null value in the Affiliations.ending field.
+Q3 (2 marks)
+Define a SQL view Q3(status, name, faculty, starting) that finds out among all of the current Dean of Faculty, the one who has served the longest time and the one who has served the shortest time. Each tuple in the view should contain the following:
+  status ( ‘Longest serving’ or ‘Shortest serving’, cast to text)
+  his/her name (use the name field from the People table)
+  thefaculty(usethelongnamefieldfromtheOrgUnitstable)
+  the date that he/she was appointed (use the starting date from the Affiliations table)
+Note: You are allowed to use the SQL view Q2 you created. It is possible that there are more than one longest serving Dean of Faculty because multiple Dean of Faculty might be appointed at the same time. Similarly, it is possible that there are more than one shortest serving Dean of Faculty.
+Q4 (2 marks)
+It was claimed that having both uoc and eftsload in the Subjects table was unnecessary, since one could be determined from the other (e.g., uoc/48 == eftsload). We could test this by calculating the ratio of uoc/eftsload for all subjects to see whether they adhere to the uoc/eftsload ratio being constant. Since the eftsload values in data files are truncated to three decimal places, some of the ratios won't be exact; to allow for this, take only one decimal place in your ratio calculations.
+Define an SQL view to produce a list of distinct uoc/eftsload values and the number of subjects which has each value, as follows:
+create or replace view Q4(ratio, nsubjects) as ...
+Note: use numeric(4,1) to restrict the precision of the ratios, and be careful about typecasting between integers and reals. You can ignore any subjects with eftsload values that are either NULL or zero.
+Q5 (3 marks)
+Define SQL views Q5a(num), Q5b(num) and Q5c(num), which give the number of, respectively   international students enrolled in 10S1 in Software Engineering (SENGA1) stream
+  local students enrolled in 10S1 in the Computer Science (3978) degree
+  all students enrolled in 10S1 in degrees offered by Faculty of Engineering
+Q6 (2 marks)
+On the webpages for class details, UNSW wants to display course names as a combination of course code (e.g. COMP9311) and course name (e.g. Database Systems). Define a SQL function that takes as parameter a UNSW course code and returns text that concatenates code (use the code field from the Subjects table), a single white space and name (use the name field from the Subjects table), e.g. COMP9311 Database Systems. The function should be defined as follows:
+create or replace function Q6(text) returns text
+Q7 (3 marks)
+Database Systems course admins would like to know that for each semester, whether the number of students enrolled in is increasing or decreasing compared with the previous semester. Define a SQL view Q7(year, term, perc_growth) that will help them to monitor the percentage of growth of students enrolled in each semester. Each tuple in the view should contain the following:
+  the year (Semesters.year) of the semester
+  the term (Semesters.term)
+  the fraction (number of students enrolled in this course this semester /number of students
+enrolled in this course last semester) as numeric(4,2)
+Database Systems has value ‘Database Systems’ in the Subjects.name field. You can find the information about all the course offerings for a given subject from Courses. You should compute the number of enrolled students for a course offering from the table Course_enrolments. You should do the fraction calculation using floating point values to achieve the highest precision.
+Note:
+(1). There are two subjects that share the same name “Database Systems”, and we do not distinguish them for the purpose of this question. In consequence, you may find more than one courses for a single semester. In such case, please count students enrolled in them together.
+(2). Please do not assume that newer semesters always have Semesters.id greater than older semesters. You should determine which semester comes earlier by comparing Semesters.starting field. And we define “last semester” as the most recent semester among all the past semesters. The first semester in history do not have its “last semester”. Please do not include it in your results.
+Q8 (3 marks)
+UNSW is welcoming more and more students each year, and as a result is running out of teaching facilities. Therefore, UNSW wants to drop the least popular subjects. Define a SQL view Q8(subject) that lists the least popular subjects. A subject is one of the least popular subjects if the subject has at least 20 course offerings, and there are less than 20 distinct students enrolled (via the Course_enrolments table) in each of the most recent 20 course offerings of the subject. Each tuple in the view should contain the following:
+  the subject code (Subjects.code field) and name (Subjects.name field), in the format e.g. COMP9311 Database Systems
+Note: Some course offerings have no students enrolled in. It appears in Courses, but not in Course_enrolments. Excluding such course offerings will result in incorrect results.
+Q9 (2 marks)
+To understand the students’ performance, Database Systems course admins would like to know that for each year, the pass rate for semester 1 and semester 2. Define a SQL view Q9(year, s1_pass_rate, s2_pass_rate) that gives a list of years when courses of Database Systems are offered, along with the pass rate for both semester 1 and semester 2. Each tuple in the view should contain the following:
+  the year (Semesters.year field in the format of the last 2 digits (i.e., 17 for 2017))
+  semester 1 pass rate (number of students who have Course_enrolments.mark >= 50 /
+number of students who have actually received a mark, i.e.
+Course_enrolments.mark >= 0) as numeric(4,2)
+  semester 2 pass rate as numeric(4,2)
+Note:
+(1). We only consider the students who actually receive a mark for the course taken. You may use
+Course_enrolments.mark >= 0 to retrieve a list of valid students.
+(2). You may find some of the views you have created for Q7 is helpful for this question, in such case, you may reuse the views you have created for Q7.
+Q10 (4 marks)
+The head of school once heard a rumour that there is a set of CSE subjects that are extremely hard to learn. Subjects in this set have their subject codes starting with “COMP93”, and are offered in every major semester (i.e., S1 and S2) from 2002 (inclusive) to 2013 (inclusive). To understand how hard these subjects are, the head of school requested a list of students who failed every subject in the set. We say a student fails a subject if he/she had received a mark < 50 for any course offering of the subject. Define a SQL view Q10(zid, name) for the head of school. Each tuple in the view should contain the following:
+  zid (‘z’ concatenate with People.unswid field)
+  student name (taken from the People.name field)
