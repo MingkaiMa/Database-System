@@ -1,0 +1,113 @@
+Q1(5 marks)
+You may use any combination of views, SQL functions and PLpgSQL functions in this question. However, you must define at least a PLpgSQL function called Q1.
+The way UNSW computes Equivalent full-time student load (EFTSL) of each subject depends on uoc of this subject. The value of EFTSL equals the uoc of this subject divided by 48. However, we found that not all subject records are correct with this rule.
+Please write a PLpgSQL function Q1(pattern text, uoc_threshold integer) that outputs two numbers: (1) among all the subjects with incorrect EFTSL, the number of subjects whose code matches pattern; (2) among all the subjects with incorrect EFTSL, the number of subjects whose code matches pattern and uoc is greater than the given threshold uoc_threshold.
+You should use the following type definition and function header:
+create type IncorrectRecord as (pattern_number integer, uoc_number integer);
+create or replace function Q1(pattern text, uoc_threshold integer) returns setof IncorrectRecord...
+  
+Note: You do not need to consider tuples where uoc is null or eftsload is null Sample results (details can be found in check.sql):
+proj2=#select * from q1(‘ECO%’, 6);
+Q2 (6 marks)
+You may use any combination of views, SQL functions and PLpgSQL functions in this question. However, you must define at least a PLpgSQL function called Q2.
+Please write a PLpgSQL function Q2(stu_unswid integer) that takes as parameter a student’s unswid and returns all transcript records of the given student. Each transcript tuple should contain the following information: cid, term, code, name, uoc, mark, grade, rank and totalEnrols.
+You should use the following type definition for the transcript tuples:
+create type TranscriptRecord as (
+   Pattern_number
+    Uoc_number
+   79
+      5
+   );
+-- course ID
+-- semester code (e.g. 98s1)
+-- UNSW-style course code (e.g. COMP1021)
+cid integer,
+term char(4),
+code char(8),
+name text, -- corresponding subject name of the course
+uoc integer,
+-- units of credit the student obtained from
+   this course (full uoc grant to students
+   who have passed the course, 0 otherwise)
+-- numeric mark achieved
+-- grade code (e.g. FL, UF, PS, CR, DN, HD)
+-- the rank of the student in this course
+mark integer,
+grade char(2),
+rank integer,
+totalEnrols integer, -- the total number of students
+enrolled in this course with non-null
+mark
+Note: Here is all the grades that indicate a pass: 'SY', 'RS', 'PT', 'PC', 'PS', 'CR', 'DN', 'HD', 'A', 'B', 'C', 'D', 'E'. (For your interest, please refer to this for information regarding which grades indicate a pass.) You don’t have to worry about invalid unswid of students. We are not going to assess you on this. In case that mark is null, you should set rank as null. Also, a student whose mark is null should not be considered when you are ranking other students.
+You should use the following and function header:
+create or replace function Q1(stu_unswid integer) returns setof TranscriptRecord...
+Sample results (details can be found in check.sql):
+proj2=#select * from q2(2220747);
+    cid
+       term
+      code
+   Name
+     uoc
+     mark
+   grade
+      rank
+     totalEnrols
+  6295
+   03s1
+  HIST5233
+ Mod China: History & HIstoring
+   8
+ 89
+ HD
+   1
+  1
+   14104
+       05s1
+      ARTS5024
+   Research Writing
+     6
+     72
+   CR
+      3
+     4
+  ...
+    ...
+    ...
+  ...
+   ...
+   ...
+  ...
+   ...
+    ...
+  Q3 (7 marks)
+You may use any combination of views, SQL functions and PLpgSQL functions in this question. However, you must define at least a PLpgSQL function called Q3.
+Given the id of an organizational unit, please write a PLpgSQL function Q3 (org_id integer, num_sub integer, num_times integer) to help the UNSW administrative officers to find out all the staff members satisfying the following: (1) he/she has delivered more than num_sub distinct subjects in the given organization over time; (2) he/she has delivered more than num_times times for at least one subject offered by the given organization. Each tuple should include:
+ His/Her unswid
+ His/Her name
+ His/Her teaching records
+Teaching records of a staff is a concatenation of several records. Each record is about a subject he/she has delivered more than num_times times, and is offered by the given organization. Each record should include the code of the subject, the times that he/she has delivered this subject, the name of the organization (you should look at Subjects.offeredby).
+Note:
+(1). Course Tutor is not included.
+(2). A given organization may have lots of sub-organizations, and you need to include sub- organizations. For example, the faculty of engineering has 9 schools, such as biomedical engineering and CSE.
+(3). Please note that, for teaching_records, there is a space after each ‘,’. All text fields are verified with exact text matching.
+(4). Teaching records of a staff should be ordered in increasing order of Subjects.id. Records should be concatenated by ‘\n’, so that each record will be displayed in a separate line.
+You should use the following type definition and function header:
+create type TeachingRecord as as (unswid integer, staff_name text, teaching_records text);
+create or replace function Q3(org_id integer, num_sub integer, num_times integer) returns setof TeachingRecord...
+Sample results (details can be found in check.sql):
+proj2=#select * from q3(52, 20, 8);
+Note that PostgreSQL uses a + character to indicate an end-of-line in its output (as well as printing
+     unswid
+      staff_name
+     teaching_records
+    8254273
+    Chris Sorrell
+   MATS1464, 10, Materials Science & Engineering, School of+ MATS6605, 9, Materials Science & Engineering, School of +
+    9282965
+ Chris Winder
+ SESC9810, 9, Risk & Safety Science, School of + SESC9820, 9, Risk & Safety Science, School of +
+     3053938
+    Susan Hagon
+    GENS4001, 9, Physics, School of + PHYS5012, 9, Physics, School of +
+ 
+'\n').
