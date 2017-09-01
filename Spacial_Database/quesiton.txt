@@ -1,0 +1,68 @@
+Q4 (1 mark)
+Implement a function, skyline_naive(dataset text), that takes dataset (name of the given dataset) as input, create a view $dataset$_skyline_naive(x, y) that contains all the points that belong to the Skyline, and outputs the number of points belong to the Skyline.
+Note:
+(1). You should replace $dataset$ with the name of the dataset. For example, invoking skyline_naive(‘small’) should create a view small_skyline_naive(x, y).
+(2). You may want to use the dynamic SQL, the execute clause, in PL/pgSQL.
+The naïve algorithm above has complexity 𝑂(𝑛2), where 𝑛 is the number of points in the dataset. There are algorithms achieve complexity better than that. For example, the following algorithm works in 2 dimensional space and has complexity 𝑂(𝑛 log 𝑛).
+Sort the dataset by y axis in descending order, break ties with x axis in descending order. It can be proved that the first point in the sorted list always belongs to the Skyline. For the rest of the points in the sorted list, it belongs to the Skyline when it comes strictly to the right of the last found Skyline point, otherwise, it does not belong to the Skyline.
+Next, we are going to implement the faster algorithm.
+Q5 (2 marks)
+Implement a function, skyline(dataset text), that takes dataset (name of the given dataset) as input, create a view $dataset$_skyline(x, y) that contains all the points that belong to the Skyline, and outputs the number of points belong to the Skyline.
+Note:
+(1). You should replace $dataset$ with the name of the dataset. For example, invoking skyline(‘small’) should create a view small_skyline(x, y).
+(2). You may want to use the dynamic SQL, the execute clause, in PL/pgSQL.
+(3). You need to pay attention to points that share the same value on either x axis or y axis (green points in previous examples).
+Your second task is to implement functions that find out points belong to k-Skyband from a given dataset. Note that k is a variable given via parameters of your functions.
+A naïve way to do this is simply loop through all the points, and check for each point that if there are less than k other points dominant this point. This process requires a join of the given dataset with itself.
+Q6 (2 mark)
+Implement a function, skyband_naive(dataset text, k integer), that takes dataset (name of the given dataset) and k as input, create a view $dataset$_skyband_naive(x, y) that contains all the points that belong to the Skyband, and outputs the number of points belong to the Skyband.
+Note:
+(1). You should replace $dataset$ with the name of the dataset. For example, invoking skyband_naive(‘small’, 3) should create a view small_skyband_naive(x, y).
+(2). You may want to use the dynamic SQL, the execute clause, in PL/pgSQL.
+The naïve algorithm above has complexity 𝑂(𝑛2). There are algorithms achieve complexity better than that. For example, the following algorithm works in 2 dimensional space and has complexity 𝑂(𝑛log𝑛+𝑘𝑛+𝑚2).
+Sort the dataset by y axis in descending order, break ties with x axis in descending order. It can be
+proved that the first point in the sorted list always belong to the Skyline. We call this Skyline the 1st Skyline. Now, we remove points belong to the 1st Skyline, and calculate Skyline for the rest of the points, and we call this Skyline the 2nd Skyline. The following image illustrates 1st Skyline (red), 2nd Skyline (green) and 3rd Skyline (blue).
+We continue this process, and calculate the k-th Skyline. Combine these k Skylines, we get a set of points. Let 𝑚 be the number of points in this set. It can be proved that this set of points is a super set of the set of points belong to k-Skyband. And it can be proved that the k-Skyband of this set of points is the same as the k-Skyband of the original dataset. Thus, we can calculate this set of points in time 𝑂(𝑛 log 𝑛 + 𝑘𝑛), and then calculate k-Skyband in time 𝑂(𝑚2) based on the smaller set of points.
+Next, we are going to implement the faster algorithm.
+Q7 (2 marks)
+Implement a function, skyband(dataset text, k integer), that takes dataset (name of the given dataset) and k as input, create a view $dataset$_skyband(x, y) that contains all the points that belong to the Skyband, and outputs the number of points belong to the Skyband.
+Note:
+(1). You should replace $dataset$ with the name of the dataset. For example, invoking skyband(‘small’) should create a view small_skyband(x, y).
+(2). You may want to use the dynamic SQL, the execute clause, in PL/pgSQL.
+(3). You need to pay attention to points that share the same value on either x axis or y axis (green points in previous examples).
+Specifications: we provide several files to help you finish this question:
+ spatial.sql. a template file for your work.
+ load_spatial.sh. The script helps create a database “spatial”, a table “small” and a table
+“large”, and insert the points specified in “small.txt” into the table “small” and the points specified in “large.txt” into the table “large”. Note that we will test several datasets other than “small” and “large”, so you are required to take a parameter “dataset” in all functions.
+ small.txt, a small spatial dataset
+ large.txt, a large spatial dataset
+ check_spatial.sql. This is the test file. While implementing all functions, you can use
+“check_spatial.sql” to check whether the results are correct. Simply load the “check_spatial.sql” into the “spatial” database. If you have completed all the lab practices, you should know how to do this. Then, you can use “select * from check_all();'' to check if your functions work properly on the dataset “small” and “large”. The testing outputs would be as follows when everything is correct:
+    functions
+     dataset
+      result
+  
+skyline_naive
+small
+correct
+skyline_naive
+large
+correct
+skyline
+small
+correct
+skyline
+large
+correct
+skyband_naive
+small
+correct
+skyband_naive
+large
+correct
+skyband
+small
+correct
+skyband
+large
+correct
